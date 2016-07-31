@@ -6,8 +6,9 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.entity.Doc;
-import org.sansdemeure.zenindex.repository.DocRepository;
+import org.sansdemeure.zenindex.data.entity.Doc;
+import org.sansdemeure.zenindex.data.repository.DocRepository;
+import org.sansdemeure.zenindex.main.AppConfig;
 import org.sansdemeure.zenindex.util.AnnotationConfigProvider;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.slf4j.Logger;
@@ -34,8 +35,8 @@ public class TestMD5Change {
 	AnnotationConfigApplicationContext ctx;
 	File testDir;
 
-	@Autowired 
-	InjectableBean injectableBean;
+	//@Autowired 
+	//InjectableBean injectableBean;
 	
 	@Autowired 
 	DocRepository docRepository;
@@ -55,7 +56,7 @@ public class TestMD5Change {
 		d.setMd5("kqjsj655sqhjh65");
 		d.setPath("/path/to/heaven");
 		docRepository.save(d);
-		injectableBean.doSomething();
+		//injectableBean.doSomething();
 		
 	}
 

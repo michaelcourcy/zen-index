@@ -1,12 +1,12 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.repository;
+package org.sansdemeure.zenindex.data.repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.sansdemeure.zenindex.entity.Doc;
+import org.sansdemeure.zenindex.data.entity.Doc;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;

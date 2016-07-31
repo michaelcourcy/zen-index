@@ -1,9 +1,9 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.repository;
+package org.sansdemeure.zenindex.data.repository;
 
-import org.sansdemeure.zenindex.entity.Doc;
+import org.sansdemeure.zenindex.data.entity.Doc;
 import org.springframework.stereotype.Repository;
 
 /**

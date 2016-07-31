@@ -1,11 +1,11 @@
-package org.sansdemeure.zenindex.config;
+package org.sansdemeure.zenindex.data.config;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.hsqldb.util.DatabaseManagerSwing;
-import org.sansdemeure.zenindex.entity.AbstractEntity;
+import org.sansdemeure.zenindex.data.entity.AbstractEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 // TODO refine the package
-@ComponentScan("org.sansdemeure.zenindex")
+@ComponentScan("org.sansdemeure.zenindex.data")
 @EnableTransactionManagement
 public class BDDConfigForTest {
 

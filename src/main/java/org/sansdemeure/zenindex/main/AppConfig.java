@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex;
+package org.sansdemeure.zenindex.main;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(
-		basePackages = {"org.sansdemeure.zenindex" }) 
+		basePackages = {"org.sansdemeure.zenindex.main" }) 
 		
-class AppConfig {
+public class AppConfig {
 
 	@Bean
-	SpringTest mainRunner() {
-		return new SpringTest();
+	ABean mainRunner() {
+		return new ABean();
 	}
 
 }

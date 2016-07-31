@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex.entity;
+package org.sansdemeure.zenindex.data.entity;
 
 import javax.persistence.Entity;
 
