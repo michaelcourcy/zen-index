@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.hsqldb.util.DatabaseManagerSwing;
 import org.sansdemeure.zenindex.data.entity.AbstractEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,9 +18,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
+@SuppressWarnings("restriction")
 @Configuration
-// TODO refine the package
-@ComponentScan("org.sansdemeure.zenindex.data")
+@ComponentScan(basePackages = {"org.sansdemeure.zenindex.data" })
 @EnableTransactionManagement
 public class BDDConfigForTest {
 
@@ -56,12 +55,10 @@ public class BDDConfigForTest {
 	/**
 	 * If you need to view the database in a client interface uncomment the
 	 * following lines.
+	 * TODO check if it's relevant to put it in a env var.
 	 */
 	@PostConstruct
 	public void startDBManager() {
-
-		// hsqldb
-		DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
-
+		//org.hsqldb.util.DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
 	}
 }

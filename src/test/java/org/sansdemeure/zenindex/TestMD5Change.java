@@ -1,16 +1,12 @@
 package org.sansdemeure.zenindex;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sansdemeure.zenindex.data.config.BDDConfigForTest;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.repository.DocRepository;
-import org.sansdemeure.zenindex.main.AppConfig;
-import org.sansdemeure.zenindex.util.AnnotationConfigProvider;
-import org.sansdemeure.zenindex.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = BDDConfigForTest.class)
 public class TestMD5Change {
 
 	final static Logger logger = LoggerFactory.getLogger(TestMD5Change.class);
@@ -35,9 +31,7 @@ public class TestMD5Change {
 	AnnotationConfigApplicationContext ctx;
 	File testDir;
 
-	//@Autowired 
-	//InjectableBean injectableBean;
-	
+		
 	@Autowired 
 	DocRepository docRepository;
 
@@ -56,7 +50,7 @@ public class TestMD5Change {
 		d.setMd5("kqjsj655sqhjh65");
 		d.setPath("/path/to/heaven");
 		docRepository.save(d);
-		//injectableBean.doSomething();
+		
 		
 	}
 
