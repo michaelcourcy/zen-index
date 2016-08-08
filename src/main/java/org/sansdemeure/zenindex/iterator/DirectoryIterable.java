@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 /**
  * We don't know if the single directory will be the only way 
- * to provide doc to the programm, thus we decide to have 
+ * to provide doc to the program, thus we decide to have 
  * it working with an iterator. 
  * 
  * In the future Spring may be used to configure the iterator

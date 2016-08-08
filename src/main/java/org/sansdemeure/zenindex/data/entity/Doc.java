@@ -1,5 +1,7 @@
 package org.sansdemeure.zenindex.data.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 
 /**
@@ -17,6 +19,25 @@ public class Doc extends AbstractEntity{
 	 */
 	private String path;
 	
+	/**
+	 * the last time index was made on this document.
+	 */
+	private Date lastIndex;
+	
+	/**
+	 * @return the @see #lastIndex
+	 */
+	public Date getLastIndex() {
+		return lastIndex;
+	}
+
+	/**
+	 * Set @see #lastIndex
+	 */
+	public void setLastIndex(Date lastIndex) {
+		this.lastIndex = lastIndex;
+	}
+
 	/**
 	 * The md5 field is the md5 result on this file.
 	 */

@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex.data.config;
+package org.sansdemeure.zenindex.config;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
@@ -59,6 +59,6 @@ public class BDDConfigForTest {
 	 */
 	@PostConstruct
 	public void startDBManager() {
-		//org.hsqldb.util.DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
+		org.hsqldb.util.DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
 	}
 }

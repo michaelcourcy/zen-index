@@ -8,6 +8,8 @@ import java.io.File;
 import org.junit.Test;
 import org.sansdemeure.zenindex.util.FileUtil;
 
+import org.junit.Assert;
+
 /**
  * @author mcourcy
  *
@@ -30,11 +32,13 @@ public class TestFileIterator {
 		sub = new File(sub, "subOfSub2");
 		sub.mkdir();
 		
-		
+		int compteur = 0;
 		DirectoryIterator it = new DirectoryIterator(testDir);
 		while (it.hasNext()){
+			compteur++;
 			System.out.println(it.next().getAbsolutePath());
 		}
+		Assert.assertEquals(9, compteur);
 	}
 
 }

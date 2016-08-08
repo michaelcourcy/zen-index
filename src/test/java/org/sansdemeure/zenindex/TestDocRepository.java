@@ -6,9 +6,10 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.BDDConfigForTest;
+import org.sansdemeure.zenindex.config.BDDConfigForTest;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.repository.DocRepository;
+import org.sansdemeure.zenindex.util.DocUtil;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,31 +28,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = BDDConfigForTest.class)
-public class TestMD5Change {
+public class TestDocRepository {
 
-	final static Logger logger = LoggerFactory.getLogger(TestMD5Change.class);
+	final static Logger logger = LoggerFactory.getLogger(TestDocRepository.class);
 
-	AnnotationConfigApplicationContext ctx;
 	File testDir;
 
 		
 	@Autowired 
 	DocRepository docRepository;
 
-	@Before
-	public void before() throws IOException {
-		logger.debug("Prepare the directory with the single doc");
-		testDir = FileUtil.prepareEmptyDirectory(TestMD5Change.class);
-		FileUtil.copyFromResources("docs/1992/Sandokai.odt", testDir, "Sandokai.odt");
-	}
-
+	
 	@Test
 	public void testSaveADocEntity() {
-		logger.info("iterating on " + testDir.getAbsolutePath() + " directory");
+		testDir = FileUtil.prepareEmptyDirectory(TestDocRepository.class);
+		FileUtil.copyFromResources("docs/1992/Sandokai.odt", testDir, "Sandokai.odt");
+		File sandokai = new File(testDir, "Sandokai.odt");
 		Doc d = new Doc();
-		d.setMd5("kqjsj655sqhjh65");
-		d.setPath("/path/to/heaven");
+		d.setMd5(DocUtil.calculateMD5(sandokai));
+		d.setPath(sandokai.getAbsolutePath());
 		docRepository.save(d);
+		logger.info("Everything went fine");
 	}
 	
 	
