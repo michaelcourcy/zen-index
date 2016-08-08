@@ -17,7 +17,6 @@ import java.util.Stack;
  */
 public class DirectoryIterator implements Iterator<File> {
 
-	private File directory;
 	private Stack<File[]> stackFiles = new Stack<>();
 	private Stack<Integer> stackCounter = new Stack<>();
 
@@ -26,7 +25,6 @@ public class DirectoryIterator implements Iterator<File> {
 	 */
 	public DirectoryIterator(File directory) {
 		super();
-		this.directory = directory;
 		stackFiles.push(directory.listFiles());
 		stackCounter.push(0);
 	}
