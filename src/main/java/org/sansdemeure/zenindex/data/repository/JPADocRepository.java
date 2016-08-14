@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.sansdemeure.zenindex.data.entity.Doc;
+import org.sansdemeure.zenindex.data.entity.Keyword;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -33,6 +34,23 @@ public class JPADocRepository implements DocRepository {
 		} else {
 			return em.merge(doc);
 		}
+	}
+
+	@Override
+	@Transactional
+	public Keyword save(Keyword keyword) {
+		if (keyword.getId() == null){
+			em.persist(keyword);
+			return keyword;
+		} else {
+			return em.merge(keyword);
+		}
+	}
+
+	@Transactional
+	@Override
+	public Doc getDoc(Long id) {
+		return em.find(Doc.class,id);
 	}
 
 }

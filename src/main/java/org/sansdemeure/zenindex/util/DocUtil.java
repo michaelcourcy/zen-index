@@ -9,6 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Calculate a md5 sum.
@@ -17,6 +24,8 @@ import java.security.NoSuchAlgorithmException;
  *
  */
 public class DocUtil {
+	
+	final static Logger logger = LoggerFactory.getLogger(DocUtil.class);
 
 	public static String calculateMD5(File file) {
 		InputStream fis = null;
@@ -50,6 +59,35 @@ public class DocUtil {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+		
+	/**
+	 * Read the content of an odt to get content.xml as a stream.
+	 * @param odt
+	 * @throws IOException 
+	 */
+	public static InputStream getContentXML(File odt){
+		
+		try {
+			ZipFile zipFile = new ZipFile(odt);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+ 
+			while(entries.hasMoreElements()){
+			    ZipEntry entry = entries.nextElement();
+			    if (entry.getName().contains("content.xml")){
+			    	InputStream stream = zipFile.getInputStream(entry);
+			    	logger.debug("content.xml found");
+			    	return stream;
+			    }
+			}
+		} catch (ZipException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		throw new RuntimeException("Unable to find content.xml in the odt " + odt.getAbsolutePath() );
+		
 	}
 
 }

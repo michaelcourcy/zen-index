@@ -1,22 +1,29 @@
 package org.sansdemeure.zenindex;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Date;
 
-import org.junit.Before;
+import javax.transaction.Transactional;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sansdemeure.zenindex.config.BDDConfigForTest;
 import org.sansdemeure.zenindex.data.entity.Doc;
+import org.sansdemeure.zenindex.data.entity.DocPart;
+import org.sansdemeure.zenindex.data.entity.DocPartKeyword;
+import org.sansdemeure.zenindex.data.entity.Keyword;
 import org.sansdemeure.zenindex.data.repository.DocRepository;
 import org.sansdemeure.zenindex.util.DocUtil;
+import org.sansdemeure.zenindex.util.EntityFactoryForTest;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+
 
 /**
  * Build a directory with a single doc and perform test on MD5.
@@ -40,17 +47,46 @@ public class TestDocRepository {
 
 	
 	@Test
-	public void testSaveADocEntity() {
+	public void testSaveADocEntitySimple() {		
 		testDir = FileUtil.prepareEmptyDirectory(TestDocRepository.class);
 		FileUtil.copyFromResources("docs/1992/Sandokai.odt", testDir, "Sandokai.odt");
 		File sandokai = new File(testDir, "Sandokai.odt");
-		Doc d = new Doc();
-		d.setMd5(DocUtil.calculateMD5(sandokai));
-		d.setPath(sandokai.getAbsolutePath());
-		docRepository.save(d);
-		logger.info("Everything went fine");
+		Doc d = EntityFactoryForTest.makeADoc(sandokai);
+		docRepository.save(d);				
 	}
 	
+	
+	@Test	
+	@Transactional
+	public void testSaveADocEntityWithDocPartsAndKeywords() {
+		testDir = FileUtil.prepareEmptyDirectory(TestDocRepository.class);
+		FileUtil.copyFromResources("docs/1992/Sandokai.odt", testDir, "Sandokai.odt");
+		File sandokai = new File(testDir, "Sandokai.odt");
+		Doc d = EntityFactoryForTest.makeADoc(sandokai);
+		DocPart docPart = EntityFactoryForTest.makeADocPart("Sandokai");
+		Keyword keyword = EntityFactoryForTest.makeAKeyword("lumière");
+		DocPartKeyword docPartKeyword = EntityFactoryForTest.makeADocPartKeyword(1);
+		
+		//first save the keyword
+		keyword = docRepository.save(keyword);
+		
+		//then create the rest of the relationship
+		d.addDocPart(docPart);		
+		docPartKeyword.setKeyword(keyword);
+		docPartKeyword.setDocPart(docPart);
+		
+		d = docRepository.save(d);
+		
+		//check with another request that the relationship are well stored
+		
+		d = docRepository.getDoc(d.getId());
+		Assert.assertFalse(d.getDocParts().isEmpty());
+		DocPart dc = d.getDocParts().iterator().next();
+		Assert.assertFalse(dc.getDocPartKeywords().isEmpty());
+		DocPartKeyword dck = dc.getDocPartKeywords().iterator().next();
+		Assert.assertEquals("lumière", dck.getKeyword().getWord());
+		
+	}
 	
 	
 	

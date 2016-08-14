@@ -4,7 +4,7 @@
 package org.sansdemeure.zenindex.data.repository;
 
 import org.sansdemeure.zenindex.data.entity.Doc;
-import org.springframework.stereotype.Repository;
+import org.sansdemeure.zenindex.data.entity.Keyword;
 
 /**
  * @author mcourcy
@@ -13,5 +13,9 @@ import org.springframework.stereotype.Repository;
 public interface DocRepository {
 	
 	Doc save(Doc doc);
+	
+	Keyword save(Keyword keyword);
+	
+	Doc getDoc(Long id);
 
 }
