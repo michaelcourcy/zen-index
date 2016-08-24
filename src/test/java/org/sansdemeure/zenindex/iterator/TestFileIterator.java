@@ -5,10 +5,9 @@ package org.sansdemeure.zenindex.iterator;
 
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.sansdemeure.zenindex.util.FileUtil;
-
-import org.junit.Assert;
 
 /**
  * @author mcourcy

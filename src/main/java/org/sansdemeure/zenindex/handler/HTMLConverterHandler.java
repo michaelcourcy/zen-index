@@ -18,13 +18,13 @@ import org.xml.sax.Attributes;
  * @author mcourcy
  *
  */
-public class HTMLConverter {
+public class HTMLConverterHandler {
 
 	private Writer writer;
 
 	private final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	final static Logger logger = LoggerFactory.getLogger(HTMLConverter.class);
+	final static Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
 
 	int nbParagraphOpen = 0;
 	int nbParagraphclosed = 0;
@@ -40,7 +40,7 @@ public class HTMLConverter {
 	 */
 	private boolean mustGoToTheDoc = false;
 
-	public HTMLConverter(Writer writer) {
+	public HTMLConverterHandler(Writer writer) {
 		this.writer = writer;
 	}
 

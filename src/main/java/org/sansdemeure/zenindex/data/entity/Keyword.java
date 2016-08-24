@@ -3,10 +3,7 @@
  */
 package org.sansdemeure.zenindex.data.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 
 /**
  * @author mcourcy

@@ -13,12 +13,12 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OdtHandler extends DefaultHandler  {
 	
-	private HTMLConverter htmlWriter;
+	private HTMLConverterHandler htmlWriter;
 	
-	private CommentExtractor commentExtractor;
+	private CommentExtractorHandler commentExtractor;
 	
 	
-	public OdtHandler(HTMLConverter htmlWriter, CommentExtractor commentExtractor) {
+	public OdtHandler(HTMLConverterHandler htmlWriter, CommentExtractorHandler commentExtractor) {
 		this.htmlWriter = htmlWriter;
 		this.commentExtractor = commentExtractor;
 	}

@@ -21,7 +21,8 @@ public class EntityFactoryForTest {
 	
 	public static Doc makeADoc(File file){
 		Doc d = new Doc();
-		d.setMd5(DocUtil.calculateMD5(file));
+		ODTResource odtResource= new ODTResource(file);
+		d.setMd5(odtResource.calculateMD5());
 		d.setPath(file.getAbsolutePath());
 		String name = file.getName();
 		name = name.substring(0, name.lastIndexOf("."));
@@ -34,7 +35,7 @@ public class EntityFactoryForTest {
 	public static DocPart makeADocPart(String name){
 		DocPart docPart = new DocPart();
 		docPart.setText("L’obscurité existe dans la lumière, ne voyez pas que le côté obscur. La lumière existe dans l’obscurité, ne voyez pas que le côté lumineux");
-		docPart.setHtmlLink(name + ".html#JHHJAAhJ_begin");
+		docPart.setAnnotationName("JHHJAAhJ_begin");
 		docPart.setAuthor("Corpus 92");		
 		docPart.setPageStart(6);
 		docPart.setPageEnd(6);

@@ -18,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
-@SuppressWarnings("restriction")
 @Configuration
 @ComponentScan(basePackages = {"org.sansdemeure.zenindex.data" })
 @EnableTransactionManagement

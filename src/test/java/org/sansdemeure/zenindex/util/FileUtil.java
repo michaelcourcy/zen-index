@@ -14,7 +14,7 @@ public class FileUtil {
 
 	final static Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-	public static File prepareEmptyDirectory(Class testClass) {
+	public static File prepareEmptyDirectory(Class<?> testClass){
 		logger.trace("preparing empty directory for {}", testClass.getSimpleName());
 		File homeDir = new File(System.getProperty("user.home"));
 		File testDir = new File(homeDir, "zenindextest");

@@ -4,12 +4,10 @@
 package org.sansdemeure.zenindex.data.entity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 /**
@@ -27,10 +25,9 @@ public class DocPart extends AbstractEntity{
 	private String text;
 	
 	/**
-	 * For performance reason we store the link with the anchor
-	 * to the html version of the document.
+	 * the name of the annotation in the doc. 
 	 */
-	private String htmlLink;
+	private String annotationName;
 	
 	/**
 	 * In wich part this docPart start. 
@@ -62,15 +59,15 @@ public class DocPart extends AbstractEntity{
 	/**
 	 * @return the @see #htmlLink
 	 */
-	public String getHtmlLink() {
-		return htmlLink;
+	public String getAnnotationName() {
+		return annotationName;
 	}
 
 	/**
 	 * Set @see #htmlLink
 	 */
-	public void setHtmlLink(String htmlLink) {
-		this.htmlLink = htmlLink;
+	public void setAnnotationName(String annotationName) {
+		this.annotationName = annotationName;
 	}
 
 	/**

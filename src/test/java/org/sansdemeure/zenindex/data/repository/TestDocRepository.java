@@ -1,7 +1,6 @@
-package org.sansdemeure.zenindex;
+package org.sansdemeure.zenindex.data.repository;
 
 import java.io.File;
-import java.util.Date;
 
 import javax.transaction.Transactional;
 
@@ -13,8 +12,6 @@ import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.entity.DocPartKeyword;
 import org.sansdemeure.zenindex.data.entity.Keyword;
-import org.sansdemeure.zenindex.data.repository.DocRepository;
-import org.sansdemeure.zenindex.util.DocUtil;
 import org.sansdemeure.zenindex.util.EntityFactoryForTest;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.slf4j.Logger;
@@ -43,7 +40,7 @@ public class TestDocRepository {
 
 		
 	@Autowired 
-	DocRepository docRepository;
+	JPADocRepository docRepository;
 
 	
 	@Test
@@ -70,7 +67,7 @@ public class TestDocRepository {
 		//first save the keyword
 		keyword = docRepository.save(keyword);
 		
-		//then create the rest of the relationship
+		//then create the relationships
 		d.addDocPart(docPart);		
 		docPartKeyword.setKeyword(keyword);
 		docPartKeyword.setDocPart(docPart);

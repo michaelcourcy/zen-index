@@ -8,8 +8,6 @@ import javax.persistence.PersistenceContext;
 
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.Keyword;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(readOnly = true)
-public class JPADocRepository implements DocRepository {
+public class JPADocRepository {
 
 	@PersistenceContext
 	private EntityManager em;
 
-	@Override
+	
 	@Transactional
 	public Doc save(Doc doc) {
 		if (doc.getId() == null) {
@@ -36,7 +34,7 @@ public class JPADocRepository implements DocRepository {
 		}
 	}
 
-	@Override
+	
 	@Transactional
 	public Keyword save(Keyword keyword) {
 		if (keyword.getId() == null){
@@ -48,7 +46,6 @@ public class JPADocRepository implements DocRepository {
 	}
 
 	@Transactional
-	@Override
 	public Doc getDoc(Long id) {
 		return em.find(Doc.class,id);
 	}

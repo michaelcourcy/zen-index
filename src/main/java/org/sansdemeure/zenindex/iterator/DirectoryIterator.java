@@ -18,7 +18,7 @@ import java.util.Stack;
 public class DirectoryIterator implements Iterator<File> {
 
 	private Stack<File[]> stackFiles = new Stack<>();
-	private Stack<Integer> stackCounter = new Stack<>();
+	private Stack<Integer> stackCounter = new Stack<>(); 
 
 	/**
 	 * @param directory
