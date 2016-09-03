@@ -56,7 +56,7 @@ public class TestHTMLConverter {
 			};
 			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(mockwriter);
 			// we don't want to test the commentExtractor, so avoid side effect
-			CommentExtractorHandler commentExtractor = new CommentExtractorHandler() {
+			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null) {
 				public void startDocument() {
 				}
 

@@ -20,11 +20,19 @@ import org.xml.sax.Attributes;
  */
 public class HTMLConverterHandler {
 
+	//the writer that will create the files. 
 	private Writer writer;
 
 	private final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	final static Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
+	
+	/**
+	 * when a comment is empty (ie it doesn't select any text) it comes with 
+	 * no officeName attribute. In this case we create a reference to it by counting 
+	 * its apparition in the document. 
+	 */
+	private int commentWithoutOfficeName = 0;
 
 	int nbParagraphOpen = 0;
 	int nbParagraphclosed = 0;
@@ -33,12 +41,15 @@ public class HTMLConverterHandler {
 	int nbBr = 0;
 	int nbCharacter = 0;
 	int nbAnnotation = 0;
+	int nbAnnotationWithoutOfficeName = 0;
 	int nbAnnotationEnd = 0;
 
 	/**
 	 * Whether or not the characters should go in the doc.
 	 */
 	private boolean mustGoToTheDoc = false;
+
+	private boolean insideAnnotationDefinition;
 
 	public HTMLConverterHandler(Writer writer) {
 		this.writer = writer;
@@ -70,7 +81,7 @@ public class HTMLConverterHandler {
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		// a paragraph
-		if (qName.equals("text:p")) {
+		if (qName.equals("text:p")  && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
 			// we list the attributes
 			// the class of the element
@@ -84,7 +95,7 @@ public class HTMLConverterHandler {
 			}
 			writeln("<p class=\"" + styleClass + "\">");
 			nbParagraphOpen++;
-		} else if (qName.equals("text:span")) {
+		} else if (qName.equals("text:span") && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
 			// we list the attributes
 			// the class of the element
@@ -103,7 +114,9 @@ public class HTMLConverterHandler {
 			writeln("<br/>");
 			nbBr++;
 		} else if (qName.equals("office:annotation")) {
+		    insideAnnotationDefinition = true;
 			mustGoToTheDoc = false;
+			boolean officeNameFound = false;
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
 				if (attribute.equals("office:name")) {
@@ -111,7 +124,14 @@ public class HTMLConverterHandler {
 					writeln("<a name=\"" + value + "_begin\">");
 				}
 			}
-			nbAnnotation++;
+			if (!officeNameFound){
+				commentWithoutOfficeName ++;
+				String officeName = "__Annotation_withoutOfficeName__number_" + commentWithoutOfficeName; 
+				writeln("<a name=\"" + officeName + "_begin\">");
+				nbAnnotationWithoutOfficeName++;
+			}else{
+				nbAnnotation++;
+			}
 		} else if (qName.equals("office:annotation-end")) {
 			mustGoToTheDoc = false;
 			for (int i = 0; i < attributes.getLength(); i++) {
@@ -135,6 +155,9 @@ public class HTMLConverterHandler {
 	}
 
 	public void endElement(String uri, String localName, String qName) {
+		if (qName.equals("office:annotation")) {
+			insideAnnotationDefinition = false;
+		}		
 		if (qName.equals("text:p")) {
 			writeln("</p>");
 			nbParagraphclosed++;
@@ -184,6 +207,8 @@ public class HTMLConverterHandler {
 			} else {
 				logger.debug("Not all annotation have a corresponding end");
 			}
+			
+			logger.debug("{} annotations without office:name attribute found",nbAnnotationWithoutOfficeName);
 		}
 	}
 

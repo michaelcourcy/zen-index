@@ -13,6 +13,7 @@ import org.junit.Test;
  */
 public class TestDocUtilMD5 {
 	
+	@SuppressWarnings("resource")
 	@Test
 	public void testcalculateMD5(){
 		File testDir = FileUtil.prepareEmptyDirectory(TestDocUtilMD5.class);
@@ -22,7 +23,7 @@ public class TestDocUtilMD5 {
 		File sandokai = new File(testDir,"Sandokai.odt");
 		File sandokai_one_extra_character = new File(testDir,"Sandokai_one_extra_character.odt");
 		File sandokai_exact_copy = new File(testDir,"Sandokai_exact_copy.odt");
-		String md51 = new ODTResource(sandokai).calculateMD5();
+		String md51 = new ODTResource(sandokai).calculateMD5();		
 		String md52 = new ODTResource(sandokai_one_extra_character).calculateMD5();
 		String md53 = new ODTResource(sandokai_exact_copy).calculateMD5();	
 		Assert.assertNotEquals(md51, md52);
