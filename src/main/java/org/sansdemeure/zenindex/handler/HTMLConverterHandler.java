@@ -5,10 +5,15 @@ package org.sansdemeure.zenindex.handler;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * Create the html version of the document.
@@ -22,10 +27,17 @@ public class HTMLConverterHandler {
 
 	//the writer that will create the files. 
 	private Writer writer;
+	
+	//the freemarker configuration to load the right template
+	freemarker.template.Configuration freeMarkerConfiguration;
 
 	private final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
+	//the model for freemaker 
+	private Map<String, Object> model = new HashMap<>();
+	
 	final static Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
+	
 	
 	/**
 	 * when a comment is empty (ie it doesn't select any text) it comes with 
@@ -51,16 +63,15 @@ public class HTMLConverterHandler {
 
 	private boolean insideAnnotationDefinition;
 
-	public HTMLConverterHandler(Writer writer) {
+	public HTMLConverterHandler(Writer writer, freemarker.template.Configuration freeMarkerConfiguration) {
 		this.writer = writer;
+		this.freeMarkerConfiguration = freeMarkerConfiguration;
+		model.put("content", "");
+		model.put("title", "");
 	}
 
-	private void writeln(String s) {
-		try {
-			writer.write(s + LINE_SEPARATOR);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	private void addContent(String s) {
+		model.put("content", model.get("content") + s + LINE_SEPARATOR);
 	}
 
 	/**
@@ -69,13 +80,8 @@ public class HTMLConverterHandler {
 	 * autonomous document.
 	 */
 	public void startDocument() {
-		writeln("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"");
-		writeln("\"http://www.w3.org/TR/html4/loose.dtd\">");
-		writeln("<html>");
-		writeln("<head>");
-		writeln("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-		writeln("</head>");
-		writeln("<body>");
+		//TODO see how we hanle the title.
+		model.put("title", "");
 		logger.debug("header written");
 	}
 
@@ -93,7 +99,7 @@ public class HTMLConverterHandler {
 					styleClass += attributes.getValue(i) + sep;
 				}
 			}
-			writeln("<p class=\"" + styleClass + "\">");
+			addContent("<p class=\"" + styleClass + "\">");
 			nbParagraphOpen++;
 		} else if (qName.equals("text:span") && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
@@ -107,11 +113,11 @@ public class HTMLConverterHandler {
 					styleClass += attributes.getValue(i) + sep;
 				}
 			}
-			writeln("<span class=\"" + styleClass + "\">");
+			addContent("<span class=\"" + styleClass + "\">");
 			nbSpanOpen++;
 		} else if (qName.equals("text:line-break")) {
 			mustGoToTheDoc = false;
-			writeln("<br/>");
+			addContent("<br/>");
 			nbBr++;
 		} else if (qName.equals("office:annotation")) {
 		    insideAnnotationDefinition = true;
@@ -121,13 +127,14 @@ public class HTMLConverterHandler {
 				String attribute = attributes.getQName(i);
 				if (attribute.equals("office:name")) {
 					String value = attributes.getValue(i);
-					writeln("<a name=\"" + value + "_begin\">");
+					officeNameFound = true;
+					addContent("<a name=\"" + value + "_begin\">");					
 				}
 			}
 			if (!officeNameFound){
 				commentWithoutOfficeName ++;
 				String officeName = "__Annotation_withoutOfficeName__number_" + commentWithoutOfficeName; 
-				writeln("<a name=\"" + officeName + "_begin\">");
+				addContent("<a name=\"" + officeName + "_begin\">");
 				nbAnnotationWithoutOfficeName++;
 			}else{
 				nbAnnotation++;
@@ -138,7 +145,7 @@ public class HTMLConverterHandler {
 				String attribute = attributes.getQName(i);
 				if (attribute.equals("office:name")) {
 					String value = attributes.getValue(i);
-					writeln("<a name=\"" + value + "_end\">");
+					addContent("<a name=\"" + value + "_end\">");
 				}
 			}
 			nbAnnotationEnd++;
@@ -149,7 +156,7 @@ public class HTMLConverterHandler {
 
 	public void character(String s) {
 		if (mustGoToTheDoc) {
-			writeln(s);
+			addContent(s);
 			nbCharacter++;
 		}
 	}
@@ -157,20 +164,23 @@ public class HTMLConverterHandler {
 	public void endElement(String uri, String localName, String qName) {
 		if (qName.equals("office:annotation")) {
 			insideAnnotationDefinition = false;
-		}		
-		if (qName.equals("text:p")) {
-			writeln("</p>");
-			nbParagraphclosed++;
-		} else if (qName.equals("text:span")) {
-			writeln("</span>");
-			nbSpanClosed++;
+		}	
+		if (!insideAnnotationDefinition){
+			if (qName.equals("text:p")) {
+				addContent("</p>");
+				nbParagraphclosed++;
+			} else if (qName.equals("text:span")) {
+				addContent("</span>");
+				nbSpanClosed++;
+			}
 		}
 	}
 
-	public void endDocument() {
-		writeln("</body>");
-		writeln("</html>");
-
+	public void endDocument() throws IOException, TemplateException {
+		//accept html element in the document.
+		
+		Template temp = freeMarkerConfiguration.getTemplate("document.ftl");
+		temp.process(model,writer);
 		if (logger.isDebugEnabled()) {
 			if (nbParagraphOpen == 0) {
 				logger.debug("No paragraph created");

@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +66,29 @@ public class FileUtil {
 			throw new RuntimeException("Unable to copy the " + resourcePath + " to " + targetDir.getAbsolutePath()
 					+ " with the name " + targetName, e);
 		}
+	}
+	
+	public static String changeExtensionToHtml(String fileName){
+		return fileName.substring(0,fileName.lastIndexOf("."))+".html";
+	}
+
+	public static String removeExtension(String fileName) {
+		return fileName.substring(0,fileName.lastIndexOf("."));
+	}
+
+	public static String findOriginals(File[] files, File f) {
+		String name = removeExtension(f.getName());
+		List<String> origininals = new ArrayList<>();
+		List<String> potentialOrigininals = Arrays.asList(
+				name + ".pdf",
+				name + ".doc",
+				name + ".docx");
+		for (File fc : files){
+			if (potentialOrigininals.contains(fc.getName())){
+				origininals.add(fc.getName());
+			}
+		}
+		return String.join(",", origininals);
 	}
 
 	

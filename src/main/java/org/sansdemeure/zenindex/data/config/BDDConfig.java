@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex.config;
+package org.sansdemeure.zenindex.data.config;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 @Configuration
-@ComponentScan(basePackages = {"org.sansdemeure.zenindex.data" })
+@ComponentScan(basePackages = {"org.sansdemeure.zenindex.data"})
 @EnableTransactionManagement
-public class BDDConfigForTest {
+public class BDDConfig {
 
 	@Bean
 	public DataSource dataSource() {

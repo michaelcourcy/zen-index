@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Stack;
 
 /**
- * An iterator on the files present in a directory.
- * Does not behave well if the directory is changed 
+ * An iterator of all the sub-directories present in a directory.
+ * The root directory is also returned 
  * during the iteration. 
  * 
  * @author mcourcy

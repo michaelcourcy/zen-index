@@ -7,7 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 /**
@@ -22,6 +26,8 @@ public class DocPart extends AbstractEntity{
 	/**
 	 * the text of this docPart, exctract from the comment in the odt.
 	 */
+	@Column(columnDefinition = "LONGVARCHAR")
+	// @Lob
 	private String text;
 	
 	/**
@@ -48,6 +54,13 @@ public class DocPart extends AbstractEntity{
 	 */
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "docPart")	
 	private Set<DocPartKeyword> docPartKeywords;
+	
+	/**
+	 * The doc this docPart belong to. 
+	 */
+	@ManyToOne
+    @JoinColumn(name="doc_id")
+	private Doc doc;
 	
 	/**
 	 * The author of this docPart. It's information is important 
@@ -149,6 +162,55 @@ public class DocPart extends AbstractEntity{
 	public void setAuthor(String author) {
 		this.author = author;
 	}
+
+	public Doc getDoc() {
+		return doc;
+	}
+
+	public void setDoc(Doc doc) {
+		this.doc = doc;
+	}
+
+	@Override
+	public int hashCode() {
+		if (getId()!=null){
+			return super.hashCode();
+		}
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((annotationName == null) ? 0 : annotationName.hashCode());
+		result = prime * result + ((doc == null) ? 0 : doc.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (getId()!=null){
+			return super.equals(obj);
+		}
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocPart other = (DocPart) obj;
+		if (annotationName == null) {
+			if (other.annotationName != null)
+				return false;
+		} else if (!annotationName.equals(other.annotationName))
+			return false;
+		if (doc == null) {
+			if (other.doc != null)
+				return false;
+		} else if (!doc.equals(other.doc))
+			return false;
+		return true;
+	}
+
+	
+	
+	
 	
 	
 

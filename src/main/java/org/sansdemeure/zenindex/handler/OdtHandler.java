@@ -3,9 +3,13 @@
  */
 package org.sansdemeure.zenindex.handler;
 
+import java.io.IOException;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import freemarker.template.TemplateException;
 
 /**
  * @author mcourcy
@@ -59,8 +63,14 @@ public class OdtHandler extends DefaultHandler  {
 	 */
 	@Override
 	public void endDocument() throws SAXException {
-		htmlWriter.endDocument();
-		commentExtractor.endDocument();
+		try {
+			htmlWriter.endDocument();
+			commentExtractor.endDocument();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (TemplateException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

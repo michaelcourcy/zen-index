@@ -19,10 +19,18 @@ import javax.persistence.OneToMany;
 public class Doc extends AbstractEntity {
 
 	/**
-	 * The path of the file in the filsystem.
+	 * The parent path of the file in the filsystem.
 	 *
 	 */
 	private String path;
+	
+	/**
+	 * the name of the doc without any extension.
+	 * 
+	 */
+	private String name;
+
+	
 
 	/**
 	 * The last time index was made on this document.
@@ -58,8 +66,7 @@ public class Doc extends AbstractEntity {
 	/**
 	 * The docparts of this doc.
 	 */
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "doc_id")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy ="doc")
 	private Set<DocPart> docParts;
 
 	/**
@@ -128,6 +135,7 @@ public class Doc extends AbstractEntity {
 			docParts = new HashSet<>();
 		}
 		docParts.add(docPart);
+		docPart.setDoc(this);
 	}
 
 	/**
@@ -143,5 +151,61 @@ public class Doc extends AbstractEntity {
 	public void setExtraLocalisationInfo(String extraLocalisationInfo) {
 		this.extraLocalisationInfo = extraLocalisationInfo;
 	}
+
+	/**
+	 * @return the @see {@link #name}
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Set @see {@link #name}
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public int hashCode() {
+		if (getId()!=null){
+			return super.hashCode();
+		}
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (getId()!=null){
+			return super.equals(obj);
+		}
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Doc other = (Doc) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (!path.equals(other.path))
+			return false;
+		return true;
+	}
+	
+	
+	
+
+	
 
 }

@@ -39,21 +39,12 @@ public class TestCommentExtractor {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 			// we don't want to test the converter, so avoid side effect
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null) {
-				public void startDocument() {
-				}
-
-				public void startElement(String uri, String localName, String qName, Attributes attributes) {
-				}
-
-				public void character(String s) {
-				}
-
-				public void endElement(String uri, String localName, String qName) {
-				}
-
-				public void endDocument() {
-				}
+			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null,null) {
+				public void startDocument() {}
+				public void startElement(String uri, String localName, String qName, Attributes attributes) {}
+				public void character(String s) {}
+				public void endElement(String uri, String localName, String qName) {}
+				public void endDocument() {}
 			};
 			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null);
 			OdtHandler handler = new OdtHandler(htmlConverter, commentExtractor);
@@ -75,21 +66,12 @@ public class TestCommentExtractor {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 			// we don't want to test the converter, so avoid side effect
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null) {
-				public void startDocument() {
-				}
-
-				public void startElement(String uri, String localName, String qName, Attributes attributes) {
-				}
-
-				public void character(String s) {
-				}
-
-				public void endElement(String uri, String localName, String qName) {
-				}
-
-				public void endDocument() {
-				}
+			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null,null) {
+				public void startDocument() {}
+				public void startElement(String uri, String localName, String qName, Attributes attributes) {}
+				public void character(String s) {}
+				public void endElement(String uri, String localName, String qName) {}
+				public void endDocument() {}
 			};
 			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null);
 			OdtHandler handler = new OdtHandler(htmlConverter, commentExtractor);

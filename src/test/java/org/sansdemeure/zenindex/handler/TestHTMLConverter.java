@@ -6,16 +6,21 @@ package org.sansdemeure.zenindex.handler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Test;
-import org.sansdemeure.zenindex.util.ODTResource;
+import org.junit.runner.RunWith;
+import org.sansdemeure.zenindex.data.config.FreeMarkerConfig;
 import org.sansdemeure.zenindex.util.FileUtil;
+import org.sansdemeure.zenindex.util.ODTResource;
 import org.sansdemeure.zenindex.util.TestAppender;
+import org.sansdemeure.zenindex.util.WriterForTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -23,7 +28,12 @@ import org.xml.sax.SAXException;
  * @author mcourcy
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = FreeMarkerConfig.class)
 public class TestHTMLConverter {
+	
+	@Autowired
+	freemarker.template.Configuration freeMarkerConfiguration;
 
 	@Test
 	public void test() throws ParserConfigurationException, SAXException, IOException {
@@ -35,26 +45,8 @@ public class TestHTMLConverter {
 			InputStream in = odtRessource.openContentXML();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			Writer mockwriter = new Writer() {
-				@Override
-				public void write(String s) {
-					// if you want to see the effect in the console uncomment
-					System.out.print(s);
-				}
-
-				@Override
-				public void write(char[] cbuf, int off, int len) throws IOException {
-				}
-
-				@Override
-				public void flush() throws IOException {
-				}
-
-				@Override
-				public void close() throws IOException {
-				}
-			};
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(mockwriter);
+			WriterForTest wt = new WriterForTest();
+			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(wt, freeMarkerConfiguration);
 			// we don't want to test the commentExtractor, so avoid side effect
 			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null) {
 				public void startDocument() {
@@ -79,6 +71,7 @@ public class TestHTMLConverter {
 			testAppender.verify("2 annotations were created");
 			testAppender.verify("All paragraphs were closed");
 			testAppender.verify("All spans were closed");
+			
 		} 
 
 	}

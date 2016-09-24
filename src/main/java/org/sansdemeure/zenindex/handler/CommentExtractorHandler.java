@@ -101,8 +101,9 @@ public class CommentExtractorHandler {
 	 * Initiate the extractor with the already found or created keyword.
 	 * @param keywords
 	 */
-	public CommentExtractorHandler(List<Keyword> Listkeywords){
-		for (Keyword keyword : Listkeywords){
+	public CommentExtractorHandler(List<Keyword> listkeywords){
+		if (listkeywords==null) return;
+		for (Keyword keyword : listkeywords){
 			keywords.put(keyword.getWord(), keyword);
 		}
 	}
@@ -280,6 +281,7 @@ public class CommentExtractorHandler {
 
 	}
 
+	//TODO treat the pertinence 
 	private void processKeyWords(DocPart docPart, String s) {
 		String[] keywords_array = s.split(",");
 		for (String element : keywords_array) {
@@ -302,6 +304,7 @@ public class CommentExtractorHandler {
 		} else if (qName.equals("dc:creator")) {
 			dcCreatorOpened = false;
 		}
+		
 	}
 
 	public void endDocument() {
@@ -326,7 +329,7 @@ public class CommentExtractorHandler {
 				logger.debug("{} new keywords created",newKeyWordCreated);
 			}else{
 				logger.debug("no keyword created");
-			}
+			}			
 		}		
 	}
 
