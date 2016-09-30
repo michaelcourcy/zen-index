@@ -3,6 +3,7 @@ package org.sansdemeure.zenindex;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.sansdemeure.zenindex.data.repository.TestDocRepository;
+import org.sansdemeure.zenindex.data.repository.TestDocRepository2;
 import org.sansdemeure.zenindex.handler.TestCommentExtractor;
 import org.sansdemeure.zenindex.handler.TestHTMLConverter;
 import org.sansdemeure.zenindex.iterator.TestFileIterator;
@@ -15,6 +16,7 @@ import org.sansdemeure.zenindex.util.TestDocUtilMD5;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	TestDocRepository.class,
+	TestDocRepository2.class,
 	TestCommentExtractor.class,
 	TestHTMLConverter.class,
 	TestFileIterator.class,

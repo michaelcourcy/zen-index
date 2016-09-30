@@ -25,18 +25,20 @@ import freemarker.template.TemplateException;
  */
 public class HTMLConverterHandler {
 
+	private static final String CONTENT = "content";
+
 	//the writer that will create the files. 
 	private Writer writer;
 	
 	//the freemarker configuration to load the right template
 	freemarker.template.Configuration freeMarkerConfiguration;
 
-	private final static String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final  String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	//the model for freemaker 
 	private Map<String, Object> model = new HashMap<>();
 	
-	final static Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
+	static final Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
 	
 	
 	/**
@@ -66,12 +68,12 @@ public class HTMLConverterHandler {
 	public HTMLConverterHandler(Writer writer, freemarker.template.Configuration freeMarkerConfiguration) {
 		this.writer = writer;
 		this.freeMarkerConfiguration = freeMarkerConfiguration;
-		model.put("content", "");
+		model.put(CONTENT, "");
 		model.put("title", "");
 	}
 
 	private void addContent(String s) {
-		model.put("content", model.get("content") + s + LINE_SEPARATOR);
+		model.put(CONTENT, model.get(CONTENT) + s + LINE_SEPARATOR);
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class HTMLConverterHandler {
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		// a paragraph
-		if (qName.equals("text:p")  && !insideAnnotationDefinition) {
+		if ("text:p".equals(qName)  && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
 			// we list the attributes
 			// the class of the element
@@ -95,13 +97,13 @@ public class HTMLConverterHandler {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
 				String sep = (i == attributes.getLength() - 1) ? "" : " ";
-				if (attribute.equals("text:style-name")) {
+				if ("text:style-name".equals(attribute)) {
 					styleClass += attributes.getValue(i) + sep;
 				}
 			}
 			addContent("<p class=\"" + styleClass + "\">");
 			nbParagraphOpen++;
-		} else if (qName.equals("text:span") && !insideAnnotationDefinition) {
+		} else if ("text:span".equals(qName) && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
 			// we list the attributes
 			// the class of the element
@@ -109,23 +111,23 @@ public class HTMLConverterHandler {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
 				String sep = (i == attributes.getLength() - 1) ? "" : " ";
-				if (attribute.equals("text:style-name")) {
+				if ("text:style-name".equals(attribute)) {
 					styleClass += attributes.getValue(i) + sep;
 				}
 			}
 			addContent("<span class=\"" + styleClass + "\">");
 			nbSpanOpen++;
-		} else if (qName.equals("text:line-break")) {
+		} else if ("text:line-break".equals(qName)) {
 			mustGoToTheDoc = false;
 			addContent("<br/>");
 			nbBr++;
-		} else if (qName.equals("office:annotation")) {
+		} else if ("office:annotation".equals(qName)) {
 		    insideAnnotationDefinition = true;
 			mustGoToTheDoc = false;
 			boolean officeNameFound = false;
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("office:name")) {
+				if ("office:name".equals(attribute)) {
 					String value = attributes.getValue(i);
 					officeNameFound = true;
 					addContent("<a name=\"" + value + "_begin\">");					
@@ -139,11 +141,11 @@ public class HTMLConverterHandler {
 			}else{
 				nbAnnotation++;
 			}
-		} else if (qName.equals("office:annotation-end")) {
+		} else if ("office:annotation-end".equals(qName)) {
 			mustGoToTheDoc = false;
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("office:name")) {
+				if ("office:name".equals(attribute)) {
 					String value = attributes.getValue(i);
 					addContent("<a name=\"" + value + "_end\">");
 				}
@@ -162,14 +164,15 @@ public class HTMLConverterHandler {
 	}
 
 	public void endElement(String uri, String localName, String qName) {
-		if (qName.equals("office:annotation")) {
+		if ("office:annotation".equals(qName) || "office:annotation-end".equals(qName)) {
 			insideAnnotationDefinition = false;
-		}	
+			mustGoToTheDoc = true;
+		}
 		if (!insideAnnotationDefinition){
-			if (qName.equals("text:p")) {
+			if ("text:p".equals(qName)) {
 				addContent("</p>");
 				nbParagraphclosed++;
-			} else if (qName.equals("text:span")) {
+			} else if ("text:span".equals(qName)) {
 				addContent("</span>");
 				nbSpanClosed++;
 			}

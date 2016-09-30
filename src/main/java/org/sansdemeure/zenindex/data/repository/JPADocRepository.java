@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.entity.Keyword;
+import org.sansdemeure.zenindex.data.entity.dto.DocPartInfo;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,5 +84,34 @@ public class JPADocRepository {
 				.setParameter("path", path)
 				.getSingleResult();
 	}
+
+
+	public List<Keyword> getAllKeywords() {
+		return em.createQuery("From Keyword").getResultList();
+	}
+
+
+	public List<DocPartInfo> getDocPartInfos(Keyword keyword) {
+		return em.createQuery(
+				"select new " + DocPartInfo.class.getName() + "("
+				+ "d.name,"
+				+ "d.path,"
+				+ "dp.annotationName,"
+				+ "dp.pageStart,"
+				+ "dp.pageEnd,"
+				+ "dp.text,"
+				+ "dpk.pertinence"
+				+ ")"
+				+ " from DocPart as dp"
+				+ " join dp.doc as d"
+				+ " join dp.docPartKeywords as dpk"
+				+ " join dpk.keyword as k"
+				+ " where k.id = :k_id"
+ 		)
+		.setParameter("k_id", keyword.getId())
+		.getResultList();
+	}
+	
+	
 
 }

@@ -26,6 +26,7 @@ public class EntityFactoryForTest {
 		d.setPath(file.getAbsolutePath());
 		String name = file.getName();
 		name = name.substring(0, name.lastIndexOf("."));
+		d.setName(name);
 		d.setOriginals(name+ ".odt,"+name+".docx,"+name+".pdf");
 		d.setExtraLocalisationInfo("Corpus 92");
 		d.setLastIndex(new Date());
@@ -50,7 +51,7 @@ public class EntityFactoryForTest {
 	
 	public static DocPartKeyword makeADocPartKeyword(Integer pertinence){
 		DocPartKeyword docPartKeyword = new DocPartKeyword();
-		docPartKeyword.setPertinence(1);
+		docPartKeyword.setPertinence(pertinence);
 		return docPartKeyword;
 	}
 

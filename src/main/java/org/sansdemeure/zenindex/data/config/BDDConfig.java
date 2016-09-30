@@ -59,6 +59,6 @@ public class BDDConfig {
 	 */
 	@PostConstruct
 	public void startDBManager() {
-		org.hsqldb.util.DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
+		//org.hsqldb.util.DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
 	}
 }

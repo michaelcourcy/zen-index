@@ -21,6 +21,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xml.sax.SAXException;
 
+import freemarker.template.TemplateException;
+
 
 
 /**
@@ -33,9 +35,9 @@ import org.xml.sax.SAXException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ServiceConfig.class)
-public class TestBatchService {
+public class TestBatchService2 {
 
-	final static Logger logger = LoggerFactory.getLogger(TestBatchService.class);
+	final static Logger logger = LoggerFactory.getLogger(TestBatchService2.class);
 
 	File testDir;
 
@@ -47,16 +49,16 @@ public class TestBatchService {
 	JPADocRepository docRepository;
 	
 	@Test	
-	public void testTreatDocuments() throws ParserConfigurationException, SAXException, IOException {
-		testDir = FileUtil.prepareEmptyDirectory(TestBatchService.class);
+	public void testTreatDirectory() throws ParserConfigurationException, SAXException, IOException, TemplateException {
+		testDir = FileUtil.prepareEmptyDirectory(TestBatchService2.class);
 		FileUtil.copyFromResources("docs/1992/Sandokai_with_overlappingAndInsertedcomments.odt", testDir, "Sandokai.odt");
-		File sandokai = new File(testDir, "Sandokai.odt");
-		batchService.treatDocument(sandokai, "sandokai.pdf");
-		//we should have at least 7 docparts let's test it.
-		Doc doc = docRepository.getDocByNameAndPath("Sandokai",testDir.getPath());
-		List<DocPart> docParts = docRepository.getAllDocPart(doc.getId());
-		Assert.assertEquals(7, docParts.size());
-		System.out.println();
+		FileUtil.copyFromResources("docs/1995/Lille_25_juin_95.odt", testDir, "Lille_25_juin_95.odt");
+		//add a subfolder to test recursivity
+		File subdir = new File(testDir,"sub");
+		subdir.mkdir();
+		FileUtil.copyFromResources("docs/2016/2016_05_17_DZP.odt", subdir, "2016_05_17_DZP.odt");
+		batchService.start(testDir);
+
 		
 	}
 	

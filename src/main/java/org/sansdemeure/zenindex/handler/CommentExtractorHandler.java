@@ -33,7 +33,9 @@ import org.xml.sax.Attributes;
  */
 public class CommentExtractorHandler {
 	
-	final static Logger logger = LoggerFactory.getLogger(CommentExtractorHandler.class);
+	private static final String TEXT_P = "text:p";
+
+	static final Logger logger = LoggerFactory.getLogger(CommentExtractorHandler.class);
 
 	/**
 	 * docParts found in this document.
@@ -102,7 +104,9 @@ public class CommentExtractorHandler {
 	 * @param keywords
 	 */
 	public CommentExtractorHandler(List<Keyword> listkeywords){
-		if (listkeywords==null) return;
+		if (listkeywords==null) {
+			return;
+		}
 		for (Keyword keyword : listkeywords){
 			keywords.put(keyword.getWord(), keyword);
 		}
@@ -133,7 +137,7 @@ public class CommentExtractorHandler {
 	
 
 	public void startDocument() {
-
+		//Nothing to do at the start of the doc
 	}
 
 	/**
@@ -180,35 +184,86 @@ public class CommentExtractorHandler {
 	 * @param attributes
 	 */
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		//capture the style 
-		if (qName.equals("style:style")){
-			insideStyleDefinition  = true;
+		detectInsideStyleDefinition(qName, attributes); 
+		detectParagraphStyleDefinition(qName, attributes); 
+		detectAnnotation(qName, attributes);
+		detectAnnotationCreator(qName);
+		detectParagraphInAnnotation(qName); 
+		detectAnnotationEnd(qName, attributes);
+		detectPageBreak(qName, attributes);
+	}
+
+	private void detectPageBreak(String qName, Attributes attributes) {
+		//page breakers
+		if ("text:soft-page-break".equals(qName)) {
+			nbPages++;
+		} else if (TEXT_P.equals(qName) && !insideAnnotationDefinition) { 
+			checkParagraphClassInPageBreakers(attributes);
+		}
+	}
+
+	private void checkParagraphClassInPageBreakers(Attributes attributes) {
+		for (int i = 0; i < attributes.getLength(); i++) {
+			String attribute = attributes.getQName(i);
+			if ("text:style-name".equals(attribute)) {
+				String styleName = attributes.getValue(i);
+				if (pageBreakers.contains(styleName)){
+					nbPages++;
+				}
+				break;
+			}
+		}
+	}
+
+	private void detectParagraphInAnnotation(String qName) {
+		if (TEXT_P.equals(qName) && insideAnnotationDefinition) {
+			commentElementOpened = true;
+		}
+	}
+
+	private void detectAnnotationEnd(String qName, Attributes attributes) {
+		if ("office:annotation-end".equals(qName)) {
+			// an annotation is finished we must associate the text
+			// found inside the docPart.
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("style:name")) {
-					activeStyleNameDefinition = attributes.getValue(i);
+				if ("office:name".equals(attribute)) {
+					String officeName = attributes.getValue(i);
+					// we must remove it as it will be no longer
+					// fed with the text flow
+					DocPart docPartToClose = openDocparts.remove(officeName);
+					// we can add the corresponding text
+					String textToClose = potentialTextCommented.remove(officeName);
+					docPartToClose.setText(textToClose);
+					docPartToClose.setPageEnd(nbPages);
+					docparts.add(docPartToClose);
 					break;
 				}
 			}
-		} else if (insideStyleDefinition && qName.equals("style:paragraph-properties")){
-			for (int i = 0; i < attributes.getLength(); i++) {
-				String attribute = attributes.getQName(i);
-				if (attribute.equals("fo:break-before")) {
-					if(attributes.getValue(i).equals("page")){
-						pageBreakers.add(activeStyleNameDefinition);
-					}
-					break;
-				}
-			}			
-		} else if (qName.equals("office:annotation")) {
+		}
+	}
+
+	private void detectAnnotationCreator(String qName) {
+		if ("dc:creator".equals(qName)) {
+			dcCreatorOpened = true;
+		}
+	}
+
+	private void detectAnnotation(String qName, Attributes attributes) {
+		if ("office:annotation".equals(qName)) {
 			insideAnnotationDefinition = true;
 			DocPart docPart = new DocPart();
 			lastOpenDocPart = docPart;
 			boolean officeNameFound = false;
 			docPart.setPageStart(nbPages);
+			//by default pageStart are equal to pageEnd 
+			//detectAnnotationEnd may change it
+			docPart.setPageEnd(nbPages);
+			//the text may be empty in case of comment without any text 
+			docPart.setText("");
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("office:name")) {
+				if ("office:name".equals(attribute)) {
 					String officeName = attributes.getValue(i);
 					docPart.setAnnotationName(officeName);
 					openDocparts.put(officeName, docPart);
@@ -224,40 +279,34 @@ public class CommentExtractorHandler {
 				openDocparts.put(officeName, docPart);
 				//no potential text to feed.
 			}
-		} else if (qName.equals("dc:creator")) {
-			dcCreatorOpened = true;
-		} else if (qName.equals("office:annotation-end")) {
-			// an annotation is finished we must associate the text
-			// found inside the docPart.
+		}
+	}
+
+	private void detectParagraphStyleDefinition(String qName, Attributes attributes) {
+		if (insideStyleDefinition && "style:paragraph-properties".equals(qName)){
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("office:name")) {
-					String officeName = attributes.getValue(i);
-					// we must remove it as it will be no longer
-					// fed with the text flow
-					DocPart docPartToClose = openDocparts.remove(officeName);
-					// we can add the corresponding text
-					String textToClose = potentialTextCommented.remove(officeName);
-					docPartToClose.setText(textToClose);
-					docPartToClose.setPageEnd(nbPages);
-					docparts.add(docPartToClose);
+				if ("fo:break-before".equals(attribute)) {
+					addBreaker(attributes, i);
 					break;
 				}
-			}
-		} else if (qName.equals("text:p") && insideAnnotationDefinition) {
-			commentElementOpened = true;
-		} 
-		//page breakers
-		else if (qName.equals("text:soft-page-break")) {
-			nbPages++;
-		} else if (qName.equals("text:p") && !insideAnnotationDefinition) { 
+			}			
+		}
+	}
+
+	private void addBreaker(Attributes attributes, int i) {
+		if("page".equals(attributes.getValue(i))){
+			pageBreakers.add(activeStyleNameDefinition);
+		}
+	}
+
+	private void detectInsideStyleDefinition(String qName, Attributes attributes) {
+		if ("style:style".equals(qName)){
+			insideStyleDefinition  = true;
 			for (int i = 0; i < attributes.getLength(); i++) {
 				String attribute = attributes.getQName(i);
-				if (attribute.equals("text:style-name")) {
-					String styleName = attributes.getValue(i);
-					if (pageBreakers.contains(styleName)){
-						nbPages++;
-					}
+				if ("style:name".equals(attribute)) {
+					activeStyleNameDefinition = attributes.getValue(i);
 					break;
 				}
 			}
@@ -283,9 +332,9 @@ public class CommentExtractorHandler {
 
 	//TODO treat the pertinence 
 	private void processKeyWords(DocPart docPart, String s) {
-		String[] keywords_array = s.split(",");
-		for (String element : keywords_array) {
-			Keyword keyword = getOrCreateAndAddKeyword(element);
+		String[] keywordsArray = s.split(",");
+		for (String element : keywordsArray) {
+			Keyword keyword = getOrCreateAndAddKeyword(element.trim());
 			DocPartKeyword docPartKeyword = new DocPartKeyword();
 			docPartKeyword.setDocPart(docPart);
 			docPartKeyword.setKeyword(keyword);
@@ -295,13 +344,13 @@ public class CommentExtractorHandler {
 	}
 
 	public void endElement(String uri, String localName, String qName) {
-		if (qName.equals("style:style")){
+		if ("style:style".equals(qName)){
 			insideStyleDefinition  = false;
-		} else 	if (qName.equals("office:annotation")) {
+		} else 	if ("office:annotation".equals(qName)) {
 			insideAnnotationDefinition = false;
-		} else if (qName.equals("text:p") && insideAnnotationDefinition) {
+		} else if (TEXT_P.equals(qName) && insideAnnotationDefinition) {
 			commentElementOpened = false;
-		} else if (qName.equals("dc:creator")) {
+		} else if ("dc:creator".equals(qName)) {
 			dcCreatorOpened = false;
 		}
 		
@@ -318,7 +367,7 @@ public class CommentExtractorHandler {
 		}
 		//brings debug information
 		if (logger.isDebugEnabled()){
-			if (docparts.size()>0){
+			if (!docparts.isEmpty()){
 				logger.debug("{} comments were found",docparts.size());
 			}else{
 				logger.debug("no comment were found");

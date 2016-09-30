@@ -28,7 +28,7 @@ public class DocPartKeyword extends AbstractEntity {
 	 * Level of pertinence of this keyword. IE if the docPart bring a 
 	 * good comprehension for the understanding of this keyword.
 	 */
-	private Integer pertinence;
+	private Integer pertinence = 1;
 
 	/**
 	 * @return the @see #keyword

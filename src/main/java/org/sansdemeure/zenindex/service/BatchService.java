@@ -8,7 +8,9 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,15 +20,21 @@ import javax.xml.parsers.SAXParserFactory;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.entity.Keyword;
+import org.sansdemeure.zenindex.data.entity.dto.DocPartInfo;
 import org.sansdemeure.zenindex.data.repository.JPADocRepository;
 import org.sansdemeure.zenindex.handler.CommentExtractorHandler;
 import org.sansdemeure.zenindex.handler.HTMLConverterHandler;
 import org.sansdemeure.zenindex.handler.OdtHandler;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.sansdemeure.zenindex.util.ODTResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
+
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 @Component
 public class BatchService {
@@ -37,12 +45,19 @@ public class BatchService {
 	@Autowired
 	freemarker.template.Configuration freeMarkerConfiguration;
 	
-	public void start(File directory) throws ParserConfigurationException, SAXException, IOException{
-		treatDirectory(directory, null);
+	/**
+	 * the list of keywords we build during the recursive analysis of the directory.
+	 */
+	List<Keyword> keywords = new ArrayList<>();
+	
+	static final Logger logger = LoggerFactory.getLogger(BatchService.class);
+	
+	public void start(File directory) throws ParserConfigurationException, SAXException, IOException, TemplateException{
+		treatDirectory(directory);
 		generateIndexConsultation(directory);
 	}
 	
-	public void treatDirectory(File directory, List<Keyword> keywords) throws ParserConfigurationException, SAXException, IOException{
+	public void treatDirectory(File directory) throws ParserConfigurationException, SAXException, IOException{
 		//TARGET For high performance
 		//mark all the doc as not treated 
 		//mark all the keywords as not treated and not newDoc
@@ -64,13 +79,15 @@ public class BatchService {
 		File[] files = directory.listFiles();
 		for (File f : files){
 			if (f.getName().endsWith(".html")){
-				f.delete();
+				if(!f.delete()){
+					logger.error("Unable to delete {}",f.getAbsolutePath());
+				}
 			}else if(f.getName().endsWith(".odt")){
 				//do we have a pdf or a words ? 
 				String originals = FileUtil.findOriginals(files,f);
-				keywords = treatDocument(f, originals, keywords);				
+				treatDocument(f, originals);				
 			}else if(f.isDirectory()){
-				treatDirectory(f, keywords);
+				treatDirectory(f);
 			}
 		}
 		
@@ -95,7 +112,7 @@ public class BatchService {
 	 * @throws IOException 
 	 */
 	@Transactional
-	public List<Keyword> treatDocument(File odtFile, String originals, List<Keyword> keywords) throws ParserConfigurationException, SAXException, IOException{
+	public void treatDocument(File odtFile, String originals) throws ParserConfigurationException, SAXException, IOException{
 		//TARGET For high performance
 		//check if originals has changed
 		//md5 exist so we have nothing to do except changing the path of the doc
@@ -145,14 +162,13 @@ public class BatchService {
 			for(DocPart docPart : commentExtractor.getDocparts()){
 				d.addDocPart(docPart);
 			}
-			docRepository.save(d);
+			docRepository.save(d);			
 		}
-		return keywords;
 	}
 	
 	
 	
-	public void generateIndexConsultation(File directory){
+	public void generateIndexConsultation(File directory) throws IOException, TemplateException{
 		//TARGET For high performance
 		//if all the keywords are not newDoc do nothing ...
 		//otherwise
@@ -164,24 +180,57 @@ public class BatchService {
 		//generate index.html
 		//for each keyword generate keyworld page
 		//remove old index
-//		File index = new File(directory, "index.html");
-//		if (index.exists()){
-//			index.delete();
-//		}
-//		File keywordDirectory = new File(directory,"keywords");
-//		if (keywordDirectory.exists()){
-//			if (keywordDirectory.isDirectory()){
-//				FileUtil.deleteDir(keywordDirectory);
-//			}else{
-//				//unlikely but we never know ..
-//				keywordDirectory.delete();
-//			}
-//		}
-//		List<Keyword> keywords = docRepository.getAllKeywords();
-//		for (Keyword keyword : keywords){
-//			generateKeyWordPage(keywordDirectory,keyword);			
-//		}
-//		generateIndexPage(keywordDirectory,keyword);
+		File index = new File(directory, "index.html");
+		if (index.exists()){
+			if (index.delete()){
+				logger.error("{} deleted",index.getAbsolutePath());
+			}else{
+				logger.error("unable to delete {}",index.getAbsolutePath());
+			}
+		}
+		File keywordDirectory = new File(directory,"keywords");
+		if (keywordDirectory.exists()){
+			if (keywordDirectory.isDirectory()){
+				FileUtil.deleteDir(keywordDirectory);
+			}else{
+				//unlikely but we never know ..
+				if(keywordDirectory.delete()){
+					logger.debug("the non directory file keywords has been deleted");
+				}
+			}
+		}
+		keywordDirectory.mkdir();
+		for (Keyword keyword : keywords){
+			generateKeyWordPage(keywordDirectory,keyword);			
+		}
+		generateIndexPage(directory);
+	}
+
+	private void generateIndexPage(File directory) throws IOException, TemplateException {
+		File indexFile = new File(directory,"index.html");
+		FileOutputStream out = new FileOutputStream(indexFile);
+		OutputStreamWriter writer = new OutputStreamWriter(out, Charset.forName("UTF-8").newEncoder());
+		Template temp = freeMarkerConfiguration.getTemplate("index.ftl");
+		Map<String, Object> model = new HashMap<>();
+		model.put("keywords",docRepository.getAllKeywords());
+		temp.process(model,writer);
+		out.close();
+		writer.close();
+	}
+
+	private void generateKeyWordPage(File keywordDirectory, Keyword keyword) throws IOException, TemplateException {
+		File keywordFile = new File(keywordDirectory, keyword.getWord()+".html");
+		FileOutputStream out = new FileOutputStream(keywordFile);
+		OutputStreamWriter writer = new OutputStreamWriter(out, Charset.forName("UTF-8").newEncoder());
+		Template temp = freeMarkerConfiguration.getTemplate("keyword.ftl");
+		Map<String, Object> model = new HashMap<>();
+		model.put("keyword", keyword.getWord());
+		model.put("keywordDirectory", keywordDirectory.getAbsolutePath());
+		List<DocPartInfo> docpartInfos = docRepository.getDocPartInfos(keyword);
+		model.put("docpartInfos", docpartInfos);
+		temp.process(model,writer);
+		out.close();
+		writer.close();
 	}
 	
 	

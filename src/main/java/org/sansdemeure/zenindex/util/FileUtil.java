@@ -4,6 +4,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,13 +39,15 @@ public class FileUtil {
 	}
 	
 	public static void deleteDir(File file) {
-		File[] contents = file.listFiles();
-		if (contents != null) {
-			for (File f : contents) {
+		File[] files = file.listFiles();
+		if (files != null) {
+			for (File f : files) {
 				deleteDir(f);
 			}
 		}
-		file.delete();
+		if (!file.delete()){
+			logger.error("Unable to delete {}", file.getAbsolutePath());
+		}
 	}
 
 	/**
@@ -57,7 +60,11 @@ public class FileUtil {
 	 */
 	public static void copyFromResources(String resourcePath, File targetDir, String targetName) {
 		ClassLoader classLoader = FileUtil.class.getClassLoader();
-		File src = new File(classLoader.getResource(resourcePath).getFile());
+		URL url = classLoader.getResource(resourcePath);
+		if (url==null){
+			throw new RuntimeException("Problem loading " + resourcePath);
+		}
+		File src = new File(url.getFile());
 		File target = new File(targetDir, targetName);
 		logger.debug("Copying the {} to {} with the name {} ", resourcePath, targetDir.getAbsolutePath(), targetName);
 		try {
@@ -69,7 +76,7 @@ public class FileUtil {
 	}
 	
 	public static String changeExtensionToHtml(String fileName){
-		return fileName.substring(0,fileName.lastIndexOf("."))+".html";
+		return fileName.substring(0,fileName.lastIndexOf('.'))+".html";
 	}
 
 	public static String removeExtension(String fileName) {
