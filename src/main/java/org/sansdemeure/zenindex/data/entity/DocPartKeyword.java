@@ -29,6 +29,11 @@ public class DocPartKeyword extends AbstractEntity {
 	 * good comprehension for the understanding of this keyword.
 	 */
 	private Integer pertinence = 1;
+	
+	/**
+	 * Any extra information found in the pattern [key:value] for key different of pertinence.
+	 */
+	String extraInfo;
 
 	/**
 	 * @return the @see #keyword
@@ -106,6 +111,14 @@ public class DocPartKeyword extends AbstractEntity {
 		} else if (!keyword.equals(other.keyword))
 			return false;
 		return true;
+	}
+
+	public String getExtraInfo() {
+		return extraInfo;
+	}
+
+	public void setExtraInfo(String extraInfo) {
+		this.extraInfo = extraInfo;
 	}
 	
 	

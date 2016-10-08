@@ -3,10 +3,14 @@ package org.sansdemeure.zenindex.util;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,6 +100,42 @@ public class FileUtil {
 			}
 		}
 		return String.join(",", origininals);
+	}
+	
+	public static String calculateMD5(File file) {
+		InputStream fis = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
+			fis = new FileInputStream(file);
+			byte[] dataBytes = new byte[1024];
+
+			int nread = 0;
+
+			while ((nread = fis.read(dataBytes)) != -1) {
+				md.update(dataBytes, 0, nread);
+			}
+			;
+
+			byte[] mdbytes = md.digest();
+
+			// convert the byte to hex format
+			StringBuffer sb = new StringBuffer("");
+			for (int i = 0; i < mdbytes.length; i++) {
+				sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (fis != null)
+					fis.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	

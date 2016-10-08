@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.handler;
+package org.sansdemeure.zenindex.indexer.odt;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -11,6 +11,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -23,28 +24,21 @@ import freemarker.template.TemplateException;
  * @author mcourcy
  *
  */
-public class HTMLConverterHandler {
+public class OdtHTMLConverterHandler extends DefaultHandler {
 
 	private static final String CONTENT = "content";
 
-	//the writer that will create the files. 
-	private Writer writer;
-	
-	//the freemarker configuration to load the right template
-	freemarker.template.Configuration freeMarkerConfiguration;
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	private static final  String LINE_SEPARATOR = System.getProperty("line.separator");
-
-	//the model for freemaker 
+	// the model for freemaker
 	private Map<String, Object> model = new HashMap<>();
-	
-	static final Logger logger = LoggerFactory.getLogger(HTMLConverterHandler.class);
-	
-	
+
+	static final Logger logger = LoggerFactory.getLogger(OdtHTMLConverterHandler.class);
+
 	/**
-	 * when a comment is empty (ie it doesn't select any text) it comes with 
-	 * no officeName attribute. In this case we create a reference to it by counting 
-	 * its apparition in the document. 
+	 * when a comment is empty (ie it doesn't select any text) it comes with no
+	 * officeName attribute. In this case we create a reference to it by
+	 * counting its apparition in the document.
 	 */
 	private int commentWithoutOfficeName = 0;
 
@@ -65,10 +59,9 @@ public class HTMLConverterHandler {
 
 	private boolean insideAnnotationDefinition;
 
-	public HTMLConverterHandler(Writer writer, freemarker.template.Configuration freeMarkerConfiguration) {
-		this.writer = writer;
-		this.freeMarkerConfiguration = freeMarkerConfiguration;
+	public OdtHTMLConverterHandler() {
 		model.put(CONTENT, "");
+		// TODO see how we hanle the title.
 		model.put("title", "");
 	}
 
@@ -76,20 +69,15 @@ public class HTMLConverterHandler {
 		model.put(CONTENT, model.get(CONTENT) + s + LINE_SEPARATOR);
 	}
 
-	/**
-	 * Initialize the header of the html file. TODO use a template. TODO capture
-	 * the title. TODO add the style. TODO add external styles to have an
-	 * autonomous document.
-	 */
+	@Override
 	public void startDocument() {
-		//TODO see how we hanle the title.
-		model.put("title", "");
-		logger.debug("header written");
+		//nothing to do
 	}
 
+	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		// a paragraph
-		if ("text:p".equals(qName)  && !insideAnnotationDefinition) {
+		if ("text:p".equals(qName) && !insideAnnotationDefinition) {
 			mustGoToTheDoc = true;
 			// we list the attributes
 			// the class of the element
@@ -122,7 +110,7 @@ public class HTMLConverterHandler {
 			addContent("<br/>");
 			nbBr++;
 		} else if ("office:annotation".equals(qName)) {
-		    insideAnnotationDefinition = true;
+			insideAnnotationDefinition = true;
 			mustGoToTheDoc = false;
 			boolean officeNameFound = false;
 			for (int i = 0; i < attributes.getLength(); i++) {
@@ -130,15 +118,15 @@ public class HTMLConverterHandler {
 				if ("office:name".equals(attribute)) {
 					String value = attributes.getValue(i);
 					officeNameFound = true;
-					addContent("<a name=\"" + value + "_begin\">");					
+					addContent("<a name=\"" + value + "_begin\">");
 				}
 			}
-			if (!officeNameFound){
-				commentWithoutOfficeName ++;
-				String officeName = "__Annotation_withoutOfficeName__number_" + commentWithoutOfficeName; 
+			if (!officeNameFound) {
+				commentWithoutOfficeName++;
+				String officeName = "__Annotation_withoutOfficeName__number_" + commentWithoutOfficeName;
 				addContent("<a name=\"" + officeName + "_begin\">");
 				nbAnnotationWithoutOfficeName++;
-			}else{
+			} else {
 				nbAnnotation++;
 			}
 		} else if ("office:annotation-end".equals(qName)) {
@@ -156,19 +144,21 @@ public class HTMLConverterHandler {
 		}
 	}
 
-	public void character(String s) {
+	@Override
+	public void characters(char[] ch, int start, int length){		
 		if (mustGoToTheDoc) {
-			addContent(s);
+			addContent(new String(ch, start, length));
 			nbCharacter++;
 		}
 	}
 
+	@Override
 	public void endElement(String uri, String localName, String qName) {
 		if ("office:annotation".equals(qName) || "office:annotation-end".equals(qName)) {
 			insideAnnotationDefinition = false;
 			mustGoToTheDoc = true;
 		}
-		if (!insideAnnotationDefinition){
+		if (!insideAnnotationDefinition) {
 			if ("text:p".equals(qName)) {
 				addContent("</p>");
 				nbParagraphclosed++;
@@ -179,12 +169,9 @@ public class HTMLConverterHandler {
 		}
 	}
 
-	public void endDocument() throws IOException, TemplateException {
-		//accept html element in the document.
-		
-		Template temp = freeMarkerConfiguration.getTemplate("document.ftl");
-		temp.process(model,writer);
-		if (logger.isDebugEnabled()) {
+	@Override
+	public void endDocument() {
+			if (logger.isDebugEnabled()) {
 			if (nbParagraphOpen == 0) {
 				logger.debug("No paragraph created");
 			} else {
@@ -220,9 +207,13 @@ public class HTMLConverterHandler {
 			} else {
 				logger.debug("Not all annotation have a corresponding end");
 			}
-			
-			logger.debug("{} annotations without office:name attribute found",nbAnnotationWithoutOfficeName);
+
+			logger.debug("{} annotations without office:name attribute found", nbAnnotationWithoutOfficeName);
 		}
+	}
+	
+	 public Map<String, Object> getModel() {
+		return model;
 	}
 
 }

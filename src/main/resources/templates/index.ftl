@@ -10,7 +10,7 @@
 
 <#list keywords as keyword>
    
-      <br/>${keyword.word}
+      <br/><a href="keywords/${keyword.word}.html">${keyword.word}</a>
     
 </#list>
 

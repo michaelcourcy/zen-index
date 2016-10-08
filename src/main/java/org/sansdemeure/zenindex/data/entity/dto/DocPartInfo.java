@@ -11,7 +11,7 @@ public class DocPartInfo {
 	
 	
 	public DocPartInfo(String name, String path, String annotationName, Integer pageStart, Integer pageEnd, String text,
-			Integer pertinence) {
+			Integer pertinence, String extraInfo) {
 		super();
 		this.name = name;
 		this.path = path;
@@ -20,6 +20,7 @@ public class DocPartInfo {
 		this.pageEnd = pageEnd;
 		this.text = text;
 		this.pertinence = pertinence;
+		this.extraInfo = extraInfo;
 	}
 
 	/**
@@ -56,6 +57,11 @@ public class DocPartInfo {
 	 * the pertinence of the word inside the docpart.
 	 */
 	private Integer pertinence;
+	
+	/**
+	 * Any extra Info provided in the [key:value] form.
+	 */
+	private String extraInfo;
 
 	public String getName() {
 		return name;
@@ -83,6 +89,14 @@ public class DocPartInfo {
 
 	public Integer getPertinence() {
 		return pertinence;
+	}
+
+	public String getExtraInfo() {
+		return extraInfo;
+	}
+
+	public void setExtraInfo(String extraInfo) {
+		this.extraInfo = extraInfo;
 	}
 	
 	

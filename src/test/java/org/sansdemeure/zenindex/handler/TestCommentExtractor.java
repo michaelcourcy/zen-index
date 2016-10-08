@@ -6,7 +6,6 @@ package org.sansdemeure.zenindex.handler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,11 +14,11 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sansdemeure.zenindex.util.ODTResource;
 import org.sansdemeure.zenindex.data.entity.DocPart;
+import org.sansdemeure.zenindex.indexer.odt.OdtCommentExtractorHandler;
 import org.sansdemeure.zenindex.util.FileUtil;
+import org.sansdemeure.zenindex.util.ODTResource;
 import org.sansdemeure.zenindex.util.TestAppender;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
@@ -38,17 +37,8 @@ public class TestCommentExtractor {
 			InputStream in = odtRessource.openContentXML();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			// we don't want to test the converter, so avoid side effect
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null,null) {
-				public void startDocument() {}
-				public void startElement(String uri, String localName, String qName, Attributes attributes) {}
-				public void character(String s) {}
-				public void endElement(String uri, String localName, String qName) {}
-				public void endDocument() {}
-			};
-			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null);
-			OdtHandler handler = new OdtHandler(htmlConverter, commentExtractor);
-			saxParser.parse(in, handler);
+			OdtCommentExtractorHandler commentExtractor = new OdtCommentExtractorHandler(null);
+			saxParser.parse(in, commentExtractor);
 			testAppender.verify("new keywords created");
 			testAppender.verify("comments were found");
 		}
@@ -65,17 +55,8 @@ public class TestCommentExtractor {
 			InputStream in = odtRessource.openContentXML();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			// we don't want to test the converter, so avoid side effect
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(null,null) {
-				public void startDocument() {}
-				public void startElement(String uri, String localName, String qName, Attributes attributes) {}
-				public void character(String s) {}
-				public void endElement(String uri, String localName, String qName) {}
-				public void endDocument() {}
-			};
-			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null);
-			OdtHandler handler = new OdtHandler(htmlConverter, commentExtractor);
-			saxParser.parse(in, handler);
+			OdtCommentExtractorHandler commentExtractor = new OdtCommentExtractorHandler(null);
+			saxParser.parse(in, commentExtractor);
 			List<DocPart> docParts = commentExtractor.getDocparts();
 			// 3rd docPart is overlapping the 4th
 			Assert.assertTrue(docParts.get(2).getText().equals(

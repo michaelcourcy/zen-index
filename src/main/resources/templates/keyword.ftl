@@ -8,27 +8,29 @@
 <body>
 <h1>${keyword}</h1>
 
-<table border="1">
+<table border="1" width="100%">
   <tr>
-  	<td>Doc</td>
-  	<td>path</td>
-  	<td>link</td>
+  	<td>Document Name</td>
+  	<td>Open odt</td>
+  	<td>Go to the comment</td>
   	<td>Page Start</td>
   	<td>Page End</td>
   	<td>text</td>
   	<td>pertinence</td>
+  	<td>extra information</td>
   </tr>
 
 <#list docpartInfos as info>
    
       <tr>
       	<td>${info.name}</td>
-      	<td>${info.path}</td>
-      	<td>${info.annotationName}</td>
+      	<td><a href="${info.path}/${info.name}.odt">Odt</a></td>
+      	<td><a href="${info.path}/${info.name}.html#${info.annotationName}_begin">Html</a></td>
       	<td>${info.pageStart}</td>
       	<td>${info.pageEnd}</td>
       	<td>${info.text}</td>
       	<td>${info.pertinence}</td>
+      	<td>${info.extraInfo}</td>
       </tr>
     
 </#list>

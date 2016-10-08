@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.handler;
+package org.sansdemeure.zenindex.indexer.odt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +13,13 @@ import java.util.Set;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.entity.DocPartKeyword;
 import org.sansdemeure.zenindex.data.entity.Keyword;
+import org.sansdemeure.zenindex.util.Pair;
+import org.sansdemeure.zenindex.util.RegexpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A comment extractor extract all the comments in a odt doc and build docparts
@@ -31,11 +35,11 @@ import org.xml.sax.Attributes;
  * @author mcourcy
  *
  */
-public class CommentExtractorHandler {
+public class OdtCommentExtractorHandler extends DefaultHandler {
 	
 	private static final String TEXT_P = "text:p";
 
-	static final Logger logger = LoggerFactory.getLogger(CommentExtractorHandler.class);
+	static final Logger logger = LoggerFactory.getLogger(OdtCommentExtractorHandler.class);
 
 	/**
 	 * docParts found in this document.
@@ -103,7 +107,7 @@ public class CommentExtractorHandler {
 	 * Initiate the extractor with the already found or created keyword.
 	 * @param keywords
 	 */
-	public CommentExtractorHandler(List<Keyword> listkeywords){
+	public OdtCommentExtractorHandler(List<Keyword> listkeywords){
 		if (listkeywords==null) {
 			return;
 		}
@@ -135,7 +139,7 @@ public class CommentExtractorHandler {
 	}
 
 	
-
+	@Override
 	public void startDocument() {
 		//Nothing to do at the start of the doc
 	}
@@ -183,6 +187,7 @@ public class CommentExtractorHandler {
 	 * @param qName
 	 * @param attributes
 	 */
+	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		detectInsideStyleDefinition(qName, attributes); 
 		detectParagraphStyleDefinition(qName, attributes); 
@@ -313,8 +318,10 @@ public class CommentExtractorHandler {
 		}
 	}
 
-	public void character(String s) {
-
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		
+		String s = new String(ch, start, length);	
 		if (dcCreatorOpened) {
 			lastOpenDocPart.setAuthor(s);
 		} else if (commentElementOpened) {
@@ -330,19 +337,25 @@ public class CommentExtractorHandler {
 
 	}
 
-	//TODO treat the pertinence 
-	private void processKeyWords(DocPart docPart, String s) {
-		String[] keywordsArray = s.split(",");
-		for (String element : keywordsArray) {
-			Keyword keyword = getOrCreateAndAddKeyword(element.trim());
+	 
+	private void processKeyWords(DocPart docPart, String allTheKeywordsWithextradata) {
+		String[] keywordsArray = allTheKeywordsWithextradata.split(",");
+		for (String keywordWithExtraData : keywordsArray) {
+			String elementTrimed = keywordWithExtraData.trim();
+			RegexpUtil.WordWithData wordWithData = RegexpUtil.getWordWithData(elementTrimed);
+			Keyword keyword = getOrCreateAndAddKeyword(wordWithData.word);
 			DocPartKeyword docPartKeyword = new DocPartKeyword();
 			docPartKeyword.setDocPart(docPart);
+			docPartKeyword.setPertinence(wordWithData.pertinence);
+			docPartKeyword.setExtraInfo(wordWithData.extrainfo);
 			docPartKeyword.setKeyword(keyword);
 			docPart.addDocPartKeyword(docPartKeyword);
 		}
+	}	
 
-	}
+	
 
+	@Override
 	public void endElement(String uri, String localName, String qName) {
 		if ("style:style".equals(qName)){
 			insideStyleDefinition  = false;
@@ -356,6 +369,7 @@ public class CommentExtractorHandler {
 		
 	}
 
+	@Override
 	public void endDocument() {
 		// some office:annotation may not have corresponding
 		// office:annotation-end

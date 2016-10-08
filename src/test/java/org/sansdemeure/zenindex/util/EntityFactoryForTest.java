@@ -22,7 +22,7 @@ public class EntityFactoryForTest {
 	public static Doc makeADoc(File file){
 		Doc d = new Doc();
 		ODTResource odtResource= new ODTResource(file);
-		d.setMd5(odtResource.calculateMD5());
+		d.setMd5(FileUtil.calculateMD5(file));
 		d.setPath(file.getAbsolutePath());
 		String name = file.getName();
 		name = name.substring(0, name.lastIndexOf("."));

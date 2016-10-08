@@ -87,7 +87,7 @@ public class JPADocRepository {
 
 
 	public List<Keyword> getAllKeywords() {
-		return em.createQuery("From Keyword").getResultList();
+		return em.createQuery("From Keyword order by word").getResultList();
 	}
 
 
@@ -100,7 +100,8 @@ public class JPADocRepository {
 				+ "dp.pageStart,"
 				+ "dp.pageEnd,"
 				+ "dp.text,"
-				+ "dpk.pertinence"
+				+ "dpk.pertinence,"
+				+ "dpk.extraInfo"
 				+ ")"
 				+ " from DocPart as dp"
 				+ " join dp.doc as d"

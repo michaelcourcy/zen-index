@@ -23,9 +23,9 @@ public class TestDocUtilMD5 {
 		File sandokai = new File(testDir,"Sandokai.odt");
 		File sandokai_one_extra_character = new File(testDir,"Sandokai_one_extra_character.odt");
 		File sandokai_exact_copy = new File(testDir,"Sandokai_exact_copy.odt");
-		String md51 = new ODTResource(sandokai).calculateMD5();		
-		String md52 = new ODTResource(sandokai_one_extra_character).calculateMD5();
-		String md53 = new ODTResource(sandokai_exact_copy).calculateMD5();	
+		String md51 = FileUtil.calculateMD5(sandokai);		
+		String md52 = FileUtil.calculateMD5(sandokai_one_extra_character);
+		String md53 = FileUtil.calculateMD5(sandokai_exact_copy);	
 		Assert.assertNotEquals(md51, md52);
 		Assert.assertEquals(md51, md53);
 	}

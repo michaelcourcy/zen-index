@@ -14,14 +14,12 @@ import javax.xml.parsers.SAXParserFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sansdemeure.zenindex.data.config.FreeMarkerConfig;
+import org.sansdemeure.zenindex.indexer.odt.OdtHTMLConverterHandler;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.sansdemeure.zenindex.util.ODTResource;
 import org.sansdemeure.zenindex.util.TestAppender;
-import org.sansdemeure.zenindex.util.WriterForTest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
@@ -32,9 +30,7 @@ import org.xml.sax.SAXException;
 @ContextConfiguration(classes = FreeMarkerConfig.class)
 public class TestHTMLConverter {
 	
-	@Autowired
-	freemarker.template.Configuration freeMarkerConfiguration;
-
+	
 	@Test
 	public void test() throws ParserConfigurationException, SAXException, IOException {
 		TestAppender testAppender = new TestAppender();
@@ -45,33 +41,13 @@ public class TestHTMLConverter {
 			InputStream in = odtRessource.openContentXML();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			WriterForTest wt = new WriterForTest();
-			HTMLConverterHandler htmlConverter = new HTMLConverterHandler(wt, freeMarkerConfiguration);
-			// we don't want to test the commentExtractor, so avoid side effect
-			CommentExtractorHandler commentExtractor = new CommentExtractorHandler(null) {
-				public void startDocument() {
-				}
-
-				public void startElement(String uri, String localName, String qName, Attributes attributes) {
-				}
-
-				public void character(String s) {
-				}
-
-				public void endElement(String uri, String localName, String qName) {
-				}
-
-				public void endDocument() {
-				}
-			};
-			OdtHandler handler = new OdtHandler(htmlConverter, commentExtractor);
-			saxParser.parse(in, handler);
+			OdtHTMLConverterHandler htmlConverter = new OdtHTMLConverterHandler();
+			saxParser.parse(in, htmlConverter);
 			testAppender.verify("paragraphs were created");
 			testAppender.verify("spans were created");
 			testAppender.verify("2 annotations were created");
 			testAppender.verify("All paragraphs were closed");
 			testAppender.verify("All spans were closed");
-			
 		} 
 
 	}
