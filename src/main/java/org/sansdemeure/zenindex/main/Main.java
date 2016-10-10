@@ -34,7 +34,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		Instant start = Instant.now();
+		Instant start = Instant.now(); 
 		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		ctx.register(ServiceConfig.class);
