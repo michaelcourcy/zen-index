@@ -17,22 +17,26 @@
 package org.sansdemeure.zenindex.main;
 
 
+import java.io.File;
+
+import org.sansdemeure.zenindex.config.ServiceConfig;
+import org.sansdemeure.zenindex.service.BatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {
 
-	final static Logger logger = LoggerFactory.getLogger(Main.class);
+	static final  Logger logger = LoggerFactory.getLogger(Main.class);
 
 	
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		ctx.register(AppConfig.class);
+		ctx.register(ServiceConfig.class);
 		ctx.refresh();
 
-		ABean aBean = (ABean) ctx.getBean("mainRunner");
-		aBean.doSomething();
+		BatchService batch = (BatchService) ctx.getBean("batchService");
+		batch.start(new File(args[0]));
 		
 		ctx.close();
 
