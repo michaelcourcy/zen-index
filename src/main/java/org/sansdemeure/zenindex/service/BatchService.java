@@ -1,7 +1,6 @@
 package org.sansdemeure.zenindex.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
@@ -19,13 +17,11 @@ import org.sansdemeure.zenindex.data.repository.JPADocRepository;
 import org.sansdemeure.zenindex.indexer.DocumentIndexer;
 import org.sansdemeure.zenindex.indexer.DocumentIndexerFactory;
 import org.sansdemeure.zenindex.util.FileUtil;
+import org.sansdemeure.zenindex.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
-
-import freemarker.template.TemplateException;
 
 @Component
 public class BatchService {
@@ -49,7 +45,7 @@ public class BatchService {
 		cleanHtmlAndKeywordFiles(directory);
 		File[] files = directory.listFiles();
 		for (File f : files) {
-			if (f.getName().endsWith(".odt")) {
+			if (DocumentIndexerFactory.canProvideAnIndexerForThisFile(f)) {
 				// do we have a pdf or a words ?
 				String originals = FileUtil.findOriginals(files, f);
 				treatDocument(f, originals);
@@ -72,8 +68,10 @@ public class BatchService {
 		Map<String, Object> model = documentIndexer.content(odtFile);
 		File htmlDocument = new File(odtFile.getParent(), name + ".html");
 		templateService.generateDocumentPage(model, htmlDocument);
-		List<DocPart> docParts = documentIndexer.getKeywordsAndDocParts(odtFile, keywords);
+		Pair<List<Keyword> , List<DocPart>> tuple = documentIndexer.getKeywordsAndDocParts(odtFile, keywords);
+		keywords = tuple.first;
 		docRepository.saveNewKeywords(keywords);
+		List<DocPart> docParts = tuple.second;
 		for (DocPart docPart : docParts) {
 			d.addDocPart(docPart);
 		}

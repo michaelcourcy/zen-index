@@ -21,7 +21,7 @@ public class TemplateService {
 	
 	private void generate(Map<String, Object> model, File htmlDocument, String template){
 		try {
-			Template temp = freeMarkerConfiguration.getTemplate("document.ftl");
+			Template temp = freeMarkerConfiguration.getTemplate(template);
 			FileOutputStream out = new FileOutputStream(htmlDocument);
 			OutputStreamWriter writer = new OutputStreamWriter(out, Charset.forName("UTF-8").newEncoder());
 			temp.process(model,writer);

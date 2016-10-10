@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.FreeMarkerConfig;
+import org.sansdemeure.zenindex.config.FreeMarkerConfig;
 import org.sansdemeure.zenindex.util.WriterForTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

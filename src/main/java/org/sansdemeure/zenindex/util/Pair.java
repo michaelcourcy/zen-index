@@ -14,7 +14,7 @@ public class Pair <K,V> {
 	
 	public Pair(){
 		super();
-	};
+	}
 	
 	public Pair(K key, V value) {
 		super();

@@ -4,10 +4,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.sansdemeure.zenindex.data.repository.TestDocRepository;
 import org.sansdemeure.zenindex.data.repository.TestDocRepository2;
-import org.sansdemeure.zenindex.handler.TestCommentExtractor;
-import org.sansdemeure.zenindex.handler.TestHTMLConverter;
+import org.sansdemeure.zenindex.indexer.odt.TestCommentExtractor;
+import org.sansdemeure.zenindex.indexer.odt.TestHTMLConverter;
 import org.sansdemeure.zenindex.iterator.TestFileIterator;
 import org.sansdemeure.zenindex.service.TestBatchService;
+import org.sansdemeure.zenindex.service.TestBatchService2;
 import org.sansdemeure.zenindex.service.TestFreeMarkerTemplate;
 import org.sansdemeure.zenindex.util.TestChangeExtensionName;
 import org.sansdemeure.zenindex.util.TestDocUtilGetContentXML;
@@ -21,6 +22,7 @@ import org.sansdemeure.zenindex.util.TestDocUtilMD5;
 	TestHTMLConverter.class,
 	TestFileIterator.class,
 	TestBatchService.class,
+	TestBatchService2.class,
 	TestFreeMarkerTemplate.class,
 	TestChangeExtensionName.class,
 	TestDocUtilGetContentXML.class,

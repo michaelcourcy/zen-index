@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex.data.config;
+package org.sansdemeure.zenindex.config;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;

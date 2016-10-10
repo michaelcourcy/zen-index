@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.handler;
+package org.sansdemeure.zenindex.indexer.odt;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class TestCommentExtractor {
 			Assert.assertTrue(docParts.get(5).getText().equals(
 					" C’est vrai, pas de parti pris, les deux sont bons, les deux sont nécessaires. Progressif est nécessaire. Venir régulièrement au zazen, venir le matin, ça, c’est progression. Mais pratiquer zazen chaque jour, c’est le ici et maintenant immédiat. C’est ce que nous faisons maintenant. A l’époque de Sekito, tout le monde parlait de la différence,  san . A l’époque, les disciples s’intéressaient beaucoup à la philosophie du Zen. Quelle école est la meilleure ? Quelle pratique est la meilleure ? Aujourd’hui, on ne s’intéresse pas beaucoup à ces problèmes. Pourtant, il existe aujourd’hui le Zen coréen, le Zen japonais, le Zen de Yasutani, le Zen américain, le Zen de Deshimaru, le Zen mélangé, « rinzoto ».  Aujourd’hui, nous sommes beaucoup plus intéressés par nous-mêmes, nos familles, nos problèmes personnels, toujours la santé : ça, c’est bon pour moi, ça, non.  Est-ce que c’est pire aujourd’hui, ou à l’époque de Sekito ? Non, les problèmes sont différents, c’est tout."));
 			// 7th doc part has no text selected
-			Assert.assertTrue(docParts.get(6).getText()==null);			
+			Assert.assertTrue("".equals(docParts.get(6).getText()));			
 			testAppender.verify("new keywords created");
 			testAppender.verify("comments were found");
 		}

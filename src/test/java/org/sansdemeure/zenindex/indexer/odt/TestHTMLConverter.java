@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.sansdemeure.zenindex.handler;
+package org.sansdemeure.zenindex.indexer.odt;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.FreeMarkerConfig;
+import org.sansdemeure.zenindex.config.FreeMarkerConfig;
 import org.sansdemeure.zenindex.indexer.odt.OdtHTMLConverterHandler;
 import org.sansdemeure.zenindex.util.FileUtil;
 import org.sansdemeure.zenindex.util.ODTResource;

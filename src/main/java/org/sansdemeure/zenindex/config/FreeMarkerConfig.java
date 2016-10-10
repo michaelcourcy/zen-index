@@ -1,4 +1,4 @@
-package org.sansdemeure.zenindex.data.config;
+package org.sansdemeure.zenindex.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

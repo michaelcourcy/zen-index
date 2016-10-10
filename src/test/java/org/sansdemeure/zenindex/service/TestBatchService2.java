@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.ServiceConfig;
+import org.sansdemeure.zenindex.config.ServiceConfig;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.repository.JPADocRepository;
@@ -58,7 +58,19 @@ public class TestBatchService2 {
 		subdir.mkdir();
 		FileUtil.copyFromResources("docs/2016/2016_05_17_DZP.odt", subdir, "2016_05_17_DZP.odt");
 		batchService.start(testDir);
-
+		
+		//it's a end to end test we're going to check the expected files has been created 
+		//but opening the doc and checking the content is consistent with the content of the doc 
+		//is a bit heavy, in a future release we'll add the framework to check the content of the generated files. 
+		File sandokai_html = new File(testDir,"Sandokai.html");
+		Assert.assertTrue(sandokai_html.exists());
+		File Lille_25_juin_95_html = new File(testDir, "Lille_25_juin_95.html");
+		Assert.assertTrue(Lille_25_juin_95_html.exists());
+		File _2016_05_17_DZP_html = new File(subdir, "2016_05_17_DZP.html");
+		Assert.assertTrue(_2016_05_17_DZP_html.exists());
+		File keywords_dir  = new File(testDir,"keywords");
+		Assert.assertTrue(keywords_dir.exists() && keywords_dir.isDirectory());
+		Assert.assertEquals(9, keywords_dir.listFiles().length);
 		
 	}
 	

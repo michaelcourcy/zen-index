@@ -8,7 +8,7 @@ import javax.transaction.Transactional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.BDDConfig;
+import org.sansdemeure.zenindex.config.BDDConfig;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.entity.DocPartKeyword;

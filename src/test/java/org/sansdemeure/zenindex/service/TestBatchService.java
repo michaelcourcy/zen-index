@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sansdemeure.zenindex.data.config.ServiceConfig;
+import org.sansdemeure.zenindex.config.ServiceConfig;
 import org.sansdemeure.zenindex.data.entity.Doc;
 import org.sansdemeure.zenindex.data.entity.DocPart;
 import org.sansdemeure.zenindex.data.repository.JPADocRepository;
