@@ -53,8 +53,11 @@ public class BatchService {
 	static final Logger logger = LoggerFactory.getLogger(BatchService.class);
 
 	public void start(File directory) {
+		logger.info("Start indexing on {}",directory.getAbsolutePath());
 		treatDirectory(directory);
+		logger.info("Indexing finished start generating consultation files");
 		generateIndexConsultation(directory);
+		logger.info("Consultation files created");		
 	}
 
 	public void treatDirectory(File directory) {

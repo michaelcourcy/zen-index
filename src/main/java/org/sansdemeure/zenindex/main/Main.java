@@ -18,6 +18,8 @@ package org.sansdemeure.zenindex.main;
 
 
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.sansdemeure.zenindex.config.ServiceConfig;
 import org.sansdemeure.zenindex.service.BatchService;
@@ -31,6 +33,9 @@ public class Main {
 
 	
 	public static void main(String[] args) {
+		
+		Instant start = Instant.now();
+		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		ctx.register(ServiceConfig.class);
 		ctx.refresh();
@@ -39,6 +44,9 @@ public class Main {
 		batch.start(new File(args[0]));
 		
 		ctx.close();
+		
+		Instant end = Instant.now();
+		logger.info("Duration of batch {}", Duration.between(start, end));
 
 	}	
 

@@ -51,7 +51,7 @@ public class BDDConfig {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setDatabase(Database.HSQL);
 		vendorAdapter.setGenerateDdl(true);
-		vendorAdapter.setShowSql(true);
+		vendorAdapter.setShowSql(false);
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter(vendorAdapter);
