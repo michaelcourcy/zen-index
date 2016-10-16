@@ -43,7 +43,7 @@ import freemarker.template.TemplateException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ServiceConfig.class)
-public class TestBatchService2 {
+public class TestBatchService2 { 
 
 	final static Logger logger = LoggerFactory.getLogger(TestBatchService2.class);
 
